@@ -415,7 +415,6 @@ namespace OpenMS.AdapterNodes
 
 
 
-
 		/// <summary>
 		/// Creates database indices.
 		/// </summary>
