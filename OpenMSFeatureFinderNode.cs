@@ -18,7 +18,7 @@ using Thermo.Metabolism.DataObjects;
 using Thermo.Metabolism.DataObjects.EntityDataObjects;
 using Thermo.Metabolism.DataObjects.PeakModels;
 //using Thermo.Magellan.BL.ReportEntityData; //for own table
-//using Thermo.Metabolism.DataObjects.EntityDataObjects;  
+//using Thermo.Metabolism.DataObjects.EntityDataObjects;
 
 
 using OpenMS.OpenMSFile;
