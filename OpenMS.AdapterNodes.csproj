@@ -104,6 +104,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="OpenMSFeatureFinderNodeMassSpectra.cs" />
+    <Compile Include="OpenMSFeatureFinderNodeTools.cs" />
     <Compile Include="OpenMSFeatureFinderNode.cs" />
     <Compile Include="UnknownFeatureIonInstanceItem.cs" />
     <Compile Include="UnknownFeatureInstanceItemChromatogramChartDataProvider.cs" />

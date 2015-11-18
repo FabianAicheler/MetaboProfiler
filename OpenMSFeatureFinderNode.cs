@@ -33,7 +33,7 @@ namespace OpenMS.AdapterNodes
 		Category = CDProcessingNodeCategories.UnknownCompounds,
         DisplayName = "MetaboProfiler",
 		MainVersion = 1,
-		MinorVersion = 0,
+		MinorVersion = 001,
         Description = "Detects and quantifies unknown compounds in the data using the OpenMS framework.")]
 
 	[ConnectionPoint("IncomingSpectra",
@@ -56,8 +56,7 @@ namespace OpenMS.AdapterNodes
 
     [ConnectionPointDataContract(
         "OutgoingItems",
-        MetabolismDataTypes.UnknownCompoundIonInstances)]
-    
+        MetabolismDataTypes.UnknownCompoundIonInstances)]    
 
     [ConnectionPoint("OutgoingPeaks",
     ConnectionDirection = ConnectionDirection.Outgoing,
@@ -94,7 +93,8 @@ namespace OpenMS.AdapterNodes
 	[ProcessingNodeConstraints(UsageConstraint = UsageConstraint.OnlyOncePerWorkflow)]
 
 	#endregion
-    public class OpenMSFeatureFinderNode : ProcessingNode<UnknownFeatureConsolidationProvider, ConsensusXMLFile>,
+
+    public partial class OpenMSFeatureFinderNode : ProcessingNode<UnknownFeatureConsolidationProvider, ConsensusXMLFile>,
         IResultsSink<MassSpectrumCollection>
 	{
 
@@ -413,8 +413,6 @@ namespace OpenMS.AdapterNodes
             return spectrumExportFileName;
         }
 
-
-
 		/// <summary>
 		/// Creates database indices.
 		/// </summary>
@@ -425,7 +423,6 @@ namespace OpenMS.AdapterNodes
 			EntityDataService.CreateIndex<XicTraceItem>();
 			EntityDataService.CreateIndex<MassSpectrumItem>();
 		}
-
 
         /// <summary>
         /// Executes the pipeline.
@@ -474,7 +471,9 @@ namespace OpenMS.AdapterNodes
                             {"in", invars[i]},
                             {"out", outvars[i]},
                             {"mass_error_ppm", masserror},
-                            {"noise_threshold_int", NoiseThreshold.ToString()}};
+                            {"noise_threshold_int", NoiseThreshold.ToString()},
+                            {"trace_termination_outliers", "2"}};
+                
 
                 ini_path = Path.Combine(NodeScratchDirectory, @"FeatureFinderMetaboDefault.ini");
 
@@ -618,80 +617,6 @@ namespace OpenMS.AdapterNodes
             return ImportFoundFeatures(m_consensusXML, origFeatures);
         }
 
-        private void create_default_ini(string execPath, string ini_path)
-        {
-            var timer = Stopwatch.StartNew();
-
-                        
-            var ini_loc = String.Format("\"{0}\"", ini_path);
-            //SendAndLogMessage(execPath + NodeScratchDirectory + ini_loc);
-
-
-            var process = new Process
-            {
-                StartInfo =
-                {
-                    FileName = execPath,
-                    WorkingDirectory = NodeScratchDirectory,
-                    Arguments = " -write_ini " + String.Format("\"{0}\"", ini_path) ,
-                    UseShellExecute = false,
-                    RedirectStandardOutput = false,
-                    CreateNoWindow = false
-                }
-            };
-
-            try
-            {
-                var openMS_shared_dir = Path.Combine(ServerConfiguration.ToolsDirectory, "OpenMS-2.0/share/OpenMS");
-                process.StartInfo.EnvironmentVariables["OPENMS_DATA_PATH"] = openMS_shared_dir;
-                process.Start();
-
-                try
-                {
-                    //SendAndLogMessage("in try");
-                    process.Refresh();
-                    //process.PriorityClass = ProcessPriorityClass.BelowNormal;//causes exception
-                    process.WaitForExit();
-                    //SendAndLogMessage("end try");
-                }
-                catch (InvalidOperationException ex)
-                {
-                    //SendAndLogMessage("in invalidoperation exception");
-                    NodeLogger.ErrorFormat(ex, "The following exception is raised during the execution of \"{0}\":", execPath);
-                    throw;
-                }
-
-                if (process.ExitCode != 0)
-                {
-                    throw new MagellanProcessingException(
-                        String.Format(
-                            "The exit code of {0} was {1}. (The expected exit code is 0)",
-                            Path.GetFileName(process.StartInfo.FileName), process.ExitCode));
-                }
-            }
-            catch (System.Threading.ThreadAbortException)
-            {
-                //SendAndLogMessage("in abort throw");
-                throw;
-            }
-            catch (Exception ex)
-            {
-                //SendAndLogMessage("in abort catch");
-                NodeLogger.ErrorFormat(ex, "The following exception is raised during the execution of \"{0}\":", execPath);
-                throw;
-            }
-            finally
-            {
-                if (!process.HasExited)
-                {
-                    NodeLogger.WarnFormat(
-                        "The process [{0}] isn't finished correctly -> force the process to exit now", process.StartInfo.FileName);
-                    process.Kill();
-                }
-            }
-        }
-        
-
 		/// <summary>
 		/// Creates the ions and peaks from featureXML.
 		/// </summary>
@@ -781,7 +706,6 @@ namespace OpenMS.AdapterNodes
 			}
 			return dict;
 		}
-
 	
         /// <summary>
         /// Imports the found features from the result file.
@@ -852,8 +776,6 @@ namespace OpenMS.AdapterNodes
 	        return featureIonToPeaks;
         }
 
-
-
 		/// <summary>
 		/// Stores information about the used entity object types and connections.
 		/// </summary>
@@ -874,479 +796,6 @@ namespace OpenMS.AdapterNodes
 			EntityDataService.RegisterEntityConnection<XicTraceItem, RetentionTimeRasterItem>(ProcessingNodeNumber);
 		}
 
-		/// <summary>
-		/// Creates and persists XIC traces for all compound ion items.
-		/// </summary>
-		private void RebuildAndPersistCompoundIonTraces(
-			int fileID,
-			IEnumerable<SpectrumDescriptor> spectrumDescriptors,
-			Dictionary<UnknownFeatureIonInstanceItem, List<ChromatogramPeakItem>> ionInstanceToPeaksMap)
-		{
-			SendAndLogTemporaryMessage("Re-creating XIC traces...");
-			var time = Stopwatch.StartNew();
-
-			// init XICPattern builder
-			var xicPatternBuilder = new Func<List<ChromatogramPeakItem>, XICPattern>(
-				peaks =>
-				{
-					var masks = peaks.Select(
-						peak => new XICMask(
-							peak.IsotopeNumber,
-							peak.Mass,
-							MassTolerance.Value)
-						).ToList();
-
-					return new XICPattern(masks);
-				});
-
-			// make XIC patterns
-			var xicPatterns = ionInstanceToPeaksMap.ToDictionary(item => item.Key, item => xicPatternBuilder(item.Value));
-
-			// init XIC tracer
-			var tracer = new XICTraceGenerator<UnknownFeatureIonInstanceItem>(xicPatterns);
-
-			// get sprectrum IDs
-			var spectrumIds = spectrumDescriptors
-				.Where(s => s.ScanEvent.MSOrder == MSOrderType.MS1)
-				.OrderBy(o => o.Header.RetentionTimeRange.LowerLimit)
-				.Select(s => s.Header.SpectrumID)
-				.ToList();
-
-			// add spectrum to tracer
-			foreach (var spectrum in ProcessingServices.SpectrumProcessingService.ReadSpectraFromCache(spectrumIds))
-			{
-				tracer.AddSpectrum(spectrum);
-			}
-
-			// make trace items
-			var ionInstanceToTraceMap = new Dictionary<UnknownFeatureIonInstanceItem, XicTraceItem>();
-			foreach (var item in ionInstanceToPeaksMap)
-			{
-				// get trace
-				var trace = tracer.GetXICTrace(item.Key, useFullRange: true, useFullRaster: false);
-
-				// make XicTraceItem
-				ionInstanceToTraceMap.Add(
-					item.Key,
-					new XicTraceItem
-					{
-						ID = EntityDataService.NextId<XicTraceItem>(),
-						FileID = fileID,
-						Trace = new TraceData(trace),
-					});
-			}
-
-			// make raster
-			var rasterItem = MakeRetentionTimeRasterItem(tracer, fileID);
-
-			// persist traces 
-			EntityDataService.InsertItems(ionInstanceToTraceMap.Values);
-			EntityDataService.ConnectItems(ionInstanceToTraceMap.Select(s => Tuple.Create(s.Key, s.Value)));
-
-			// persist raster
-			EntityDataService.InsertItems(new[] { rasterItem });
-			EntityDataService.ConnectItems(ionInstanceToTraceMap.Select(s => Tuple.Create(s.Value, rasterItem)));
-
-			time.Stop();
-			SendAndLogVerboseMessage("Re-creating and persisting {0} XIC traces took {1:F2} s.", ionInstanceToTraceMap.Values.Count, time.Elapsed.TotalSeconds);
-			m_currentStep += 4;
-			ReportTotalProgress((double)m_currentStep / m_numSteps);
-		}
-
-		
-		/// <summary>
-		/// Creates RetentionTimeRasterItem from XICTraceGenerator.
-		/// </summary>
-		private RetentionTimeRasterItem MakeRetentionTimeRasterItem(XICTraceGenerator<UnknownFeatureIonInstanceItem> tracer, int fileID)
-		{
-			// get raster points
-			var raster = tracer.RetentionTimeRaster;
-
-			// get raster info
-			var info = tracer.RetentionTimeRasterInfo;
-
-			// make RetentionTimeRasterItem
-			return new RetentionTimeRasterItem
-			{
-				ID = EntityDataService.NextId<RetentionTimeRasterItem>(),
-				FileID = fileID,
-				MSOrder = info.MSOrder,
-				Polarity = info.Polarity,
-				IonizationSource = info.IonizationSource,
-				MassAnalyzer = info.MassAnalyzer,
-				MassRange = info.MassRange,
-				ResolutionAtMass200 = info.ResolutionAtMass200,
-				ScanRate = info.ScanRate,
-				ScanType = info.ScanType,
-				ActivationTypes = info.ActivationTypes,
-				ActivationEnergies = info.ActivationEnergies,
-				IsolationWindow = info.IsolationWindow,
-				IsolationMass = info.IsolationMass,
-				IsolationWidth = info.IsolationWidth,
-				IsolationOffset = info.IsolationOffset,
-				IsMultiplexed = info.IsMultiplexed,
-				Trace = new TraceData(raster),
-			};
-		}
-
-		
-        #region MassSpectra
-        /// <summary>
-		/// Assigns to each detected chromatogram peak the nearest MS1 spectrum and all related data dependent spectra and persists the spectra afterwards.
-		/// </summary>
-		/// <param name="spectrumDescriptors">The spectrum descriptors group by file identifier.</param>
-		/// <param name="compoundIon2IsotopePeaksDictionary">The detected peaks for each compound ion as dictionary.</param>
-		private void AssignAndPersistMassSpectra(IEnumerable<SpectrumDescriptor> spectrumDescriptors, IEnumerable<KeyValuePair<UnknownFeatureIonInstanceItem, List<ChromatogramPeakItem>>> compoundIon2IsotopePeaksDictionary)
-		{
-			var time = Stopwatch.StartNew();
-			SendAndLogTemporaryMessage("Assigning MS1 spectra...");
-
-	        var defaultCharge = 1;
-			if (spectrumDescriptors.First().ScanEvent.Polarity == PolarityType.Negative)
-			{
-				defaultCharge = -1;
-			}
-
-			var orderedSpectrumDescriptors = spectrumDescriptors
-				.OrderBy(o => o.Header.RetentionTimeCenter)
-				.ToList();
-
-			if (orderedSpectrumDescriptors.Any(a => a.ScanEvent.MSOrder == MSOrderType.MS1) == false)
-			{
-				SendAndLogErrorMessage("Exception, MS1 spectra not available (check spectrum selector node).");
-				return;
-			}
-
-			// Create peak details for each detected peak using the charge of the related compound ion
-			var detectedPeakDetails = compoundIon2IsotopePeaksDictionary.SelectMany(
-				sm => sm.Value.Select(
-					s => new DetectedPeakDetails(s)
-					{
-						Charge = sm.Key.Charge == 0 ? defaultCharge : sm.Key.Charge 
-					}))
-					.ToList();
-
-			DetectedPeakDetailsHelper.AssignMassSpectraToPeakApexes(orderedSpectrumDescriptors, detectedPeakDetails);
-
-			SendAndLogMessage("Assigning MS1 spectra to chromatogram peak apexes finished after {0}", StringHelper.GetDisplayString(time.Elapsed));
-			time.Restart();
-
-			BuildSpectralTrees(orderedSpectrumDescriptors, detectedPeakDetails);
-
-			SendAndLogTemporaryMessage("Persisting assigned spectra...");
-
-
-			// get spectrum ids of distinct spectra
-			var distinctSpectrumIds = detectedPeakDetails.SelectMany(s => s.AssignedSpectrumDescriptors)
-													 .Select(s => s.Header.SpectrumID)
-													 .Distinct()
-													 .ToList();
-
-			// Divide spectrum ids into parts to reduce the memory foot print. Therefore it is necessary to interrupt the spectra reading,
-			// because otherwise a database locked exception will be thrown when storing the spectra			
-			foreach (var spectrumIdsPartition in distinctSpectrumIds
-				.Partition(ServerConfiguration.ProcessingPacketSize))
-			{
-				// Retrieve mass spectra and create MassSpectrumItem's
-				var distinctSpectra =
-					ProcessingServices.SpectrumProcessingService.ReadSpectraFromCache(spectrumIdsPartition.ToList())
-									  .Select(
-										  s => new MassSpectrumItem
-										  {
-											  ID = s.Header.SpectrumID,
-											  FileID = s.Header.FileID,
-											  Spectrum = s
-										  })
-									  .ToList();
-
-				// Persist mass spectra
-				PersistMassSpectra(distinctSpectra);
-			}
-
-			// Persists peak <-> mass spectrum connections
-
-			var peaksToMassSpectrumConnectionList = new List<EntityConnectionItemList<ChromatogramPeakItem, MassSpectrumItem>>(detectedPeakDetails.Count);
-
-			// Get connections between spectrum and chromatographic peak
-			foreach (var item in detectedPeakDetails
-				.Where(w => w.AssignedSpectrumDescriptors.Any()))
-			{
-				var connection = new EntityConnectionItemList<ChromatogramPeakItem, MassSpectrumItem>(item.Peak);
-
-				peaksToMassSpectrumConnectionList.Add(connection);
-
-				foreach (var spectrumDescriptor in item.AssignedSpectrumDescriptors)
-				{
-					connection.AddConnection(new MassSpectrumItem
-					{
-						ID = spectrumDescriptor.Header.SpectrumID,
-						FileID = spectrumDescriptor.Header.FileID,
-						// Omit mass spectrum here to reduce the memory footprint (only the IDs are required to persist the connections)
-					});
-				}
-			}
-
-			// Persists peak <-> mass spectrum connections
-			EntityDataService.ConnectItems(peaksToMassSpectrumConnectionList);
-
-			SendAndLogMessage("Persisting spectra finished after {0}", StringHelper.GetDisplayString(time.Elapsed));
-			m_currentStep += 1;
-            ReportTotalProgress((double)m_currentStep / m_numSteps);
-			time.Stop();
-		}
-
-		/// <summary>
-		/// Builds and assigns the spectral trees for each detected chromatogram peak
-		/// </summary>
-		/// <remarks>
-		/// For each detected peak, spectral trees are generated from the MS1 scans including all matching data dependent scans eluting in that retention time range. 
-		/// Matching means that the precursor mass of the MS2 scan must match the mass used to create the chromatogram trace within the given mass tolerance. Finally all 
-		/// spectral tree with matching data dependent scans are assigned to the detected peak.
-		/// </remarks>
-		private void BuildSpectralTrees(IEnumerable<SpectrumDescriptor> spectrumDescriptors, IEnumerable<DetectedPeakDetails> peakDetails)
-		{
-			SendAndLogTemporaryMessage("Building spectral trees...");
-			var timer = Stopwatch.StartNew();
-
-			DetectedPeakDetailsHelper.AssignSpectrumTreesToPeakDetails(spectrumDescriptors.OfType<ISpectrumDescriptor>(), peakDetails, MassTolerance.Value);
-
-			timer.Stop();
-			SendAndLogMessage("Building spectral trees takes {0:F2} s.", timer.Elapsed.TotalSeconds);
-
-		}
-
-		/// <summary>
-		/// Writes all mass spectra to the result database file.		
-		/// </summary>
-		/// <param name="massSpectrumItems">The mass spectra to persist.</param>
-		private void PersistMassSpectra(IEnumerable<MassSpectrumItem> massSpectrumItems)
-		{
-			var unionEntityDataPersistenceService = ProcessingServices.Get<IUnionEntityDataPersistenceService>();
-			unionEntityDataPersistenceService.InsertItems(massSpectrumItems);
-		}
-        #endregion
-
-
-
-        #region stuff_for_tools
-        private void WriteItem(string ini_path, Dictionary<string, string> parameters)
-        {
-            XmlDocument doc = new XmlDocument();
-            doc.Load(ini_path);
-            XmlNodeList nlist = doc.GetElementsByTagName("ITEM");
-            foreach (XmlNode item in nlist)
-            {
-                foreach (string param in parameters.Keys)
-                {
-                    if (item.Attributes["name"].Value == param)
-                    {
-                        item.Attributes["value"].Value = parameters[param];
-                    }
-                }
-            }
-            //doc.Save(Path.Combine(NodeScratchDirectory, "ToolParameters.xml"));
-            doc.Save(ini_path);
-        }
-
-        //Write ITEMLISTs, used for input or output file lists
-        private static void writeItemList(string[] vars, string ini_path, string mode)
-        {
-            XmlDocument doc = new XmlDocument();
-            doc.Load(ini_path);
-            XmlNodeList itemlist = doc.GetElementsByTagName("ITEMLIST");
-            foreach (XmlNode item in itemlist)
-            {
-                //mode: in or out?
-                if (item.Attributes["name"].Value == mode)
-                {
-                    foreach (var fn in vars)
-                    {
-                        //We add LISTITEMS to until then empty ITEMLISTS
-                        var listitem = doc.CreateElement("LISTITEM");
-                        XmlAttribute newAttribute = doc.CreateAttribute("value");
-                        newAttribute.Value = fn;
-                        listitem.SetAttributeNode(newAttribute);
-                        item.AppendChild(listitem);
-                    }
-                }
-            }
-            doc.Save(ini_path);
-        }
-
-        //Write mz and rt parameters. different function than WriteItem due to specific structure in considered tools
-        private void write_MZ_RT_thresholds(string ini_path)
-        {
-            XmlDocument doc = new XmlDocument();
-            doc.Load(ini_path);
-            XmlNodeList nlist = doc.GetElementsByTagName("ITEM");
-            foreach (XmlNode item in nlist)
-            {
-                if ((item.ParentNode.Attributes["name"].Value == "distance_MZ") && (item.Attributes["name"].Value == "max_difference"))
-                {
-                    var mzthresh = MZThreshold.ToString();
-                    item.Attributes["value"].Value = mzthresh;
-                }
-                else if ((item.ParentNode.Attributes["name"].Value == "distance_MZ") && (item.Attributes["name"].Value == "unit"))
-                {
-                    //always use ppm
-                    item.Attributes["value"].Value = "ppm";
-                }
-                else if ((item.ParentNode.Attributes["name"].Value == "distance_RT") && (item.Attributes["name"].Value == "max_difference"))
-                {
-                    item.Attributes["value"].Value = (RTThreshold.Value * 60).ToString(); //need to convert minute(CD) to seconds(OpenMS)!
-                }
-            }
-            doc.Save(ini_path);
-        }
-
-        //execute specific OpenMS Tool (execPath) with specified Ini (ParamPath)        
-        private void RunTool(string execPath, string ParamPath)
-        {
-
-            var timer = Stopwatch.StartNew();
-
-            var process = new Process
-            {
-                StartInfo =
-                {
-                    FileName = execPath,
-                    WorkingDirectory = NodeScratchDirectory,
-                    //WorkingDirectory = FileHelper.GetShortFileName(NodeScratchDirectory), 
-
-                    Arguments = " -ini " + String.Format("\"{0}\"",ParamPath),
-                    UseShellExecute = false,
-                    RedirectStandardOutput = true,
-                    CreateNoWindow = false,
-                    //WindowStyle = ProcessWindowStyle.Hidden
-                }
-            };
-
-            var openMS_shared_dir = Path.Combine(ServerConfiguration.ToolsDirectory, "OpenMS-2.0/share/OpenMS");
-            process.StartInfo.EnvironmentVariables["OPENMS_DATA_PATH"] = openMS_shared_dir;
-
-            SendAndLogTemporaryMessage("Starting process [{0}] in working directory [{1}] with arguments [{2}]",
-                            process.StartInfo.FileName, process.StartInfo.WorkingDirectory, process.StartInfo.Arguments);
-
-            WriteLogMessage(MessageLevel.Debug,
-                            "Starting process [{0}] in working directory [{1}] with arguments [{2}]",
-                            process.StartInfo.FileName, process.StartInfo.WorkingDirectory, process.StartInfo.Arguments);
-                        
-            try
-            {
-                process.Start();
-
-                try
-                {
-                    //process.PriorityClass = ProcessPriorityClass.BelowNormal;
-
-                    string current_work = "";
-                    while (process.HasExited == false)
-                    {
-                        var output = process.StandardOutput.ReadLine();
-
-
-                        // move on if no new announcement. 
-                        if (String.IsNullOrEmpty(output))
-                        {
-                            continue;
-                        }
-
-                        //store all results (for now?) of OpenMS Tool output
-                        WriteLogMessage(MessageLevel.Debug, output);
-
-                        // Parse the output and report progress using the method SendAndLogTemporaryMessage
-                        if (output.Contains(@"Progress of 'loading mzML file':"))
-                        {
-                            current_work = "Progress of 'loading mzML file':";
-                        }
-                        else if (output.Contains("Progress of 'loading chromatograms':"))
-                        {
-                            current_work = "Progress of 'loading chromatograms':";
-                        }
-                        else if (output.Contains("Progress of 'mass trace detection':"))
-                        {
-                            current_work = "Progress of 'mass trace detection':";
-                        }
-                        else if (output.Contains("Progress of 'elution peak detection':"))
-                        {
-                            current_work = "Progress of 'elution peak detection':";
-                        }
-                        else if (output.Contains("Progress of 'assembling mass traces to features':"))
-                        {
-                            current_work = "Progress of 'assembling mass traces to features':";
-                        }
-                        else if (output.Contains("Progress of 'Aligning input maps':"))
-                        {
-                            current_work = "Progress of 'Aligning input maps':";
-                        }
-                        else if (output.Contains("Progress of 'linking features':"))
-                        {
-                            current_work = "Progress of 'linking features':";
-                        }
-                        else if (output.Contains("%"))
-                        {
-                            SendAndLogTemporaryMessage("{0} {1}", current_work, output);
-                        }
-
-                    }
-
-
-                    // Note: The child process waits until everything is read from the standard output -> A Deadlock could arise here
-                    using (var reader = new StringReader(process.StandardOutput.ReadToEnd()))
-                    {
-                        string output;
-
-                        while ((output = reader.ReadLine()) != null)
-                        {
-                            WriteLogMessage(MessageLevel.Debug, output);
-
-                            if (String.IsNullOrEmpty(output) == false)
-                            {
-                                SendAndLogMessage(output, false);
-                            }
-                        }
-                    }
-
-                    process.WaitForExit();
-                }
-                catch (InvalidOperationException ex)
-                {
-                    NodeLogger.ErrorFormat(ex, "The following exception is raised during the execution of \"{0}\":", execPath);
-                    throw;
-                }
-
-
-                if (process.ExitCode != 0)
-                {
-                    throw new MagellanProcessingException(
-                        String.Format(
-                            "The exit code of {0} was {1}. (The expected exit code is 0)",
-                            Path.GetFileName(process.StartInfo.FileName), process.ExitCode));
-                }
-            }
-            catch (System.Threading.ThreadAbortException)
-            {
-                throw;
-            }
-            catch (Exception ex)
-            {
-                NodeLogger.ErrorFormat(ex, "The following exception is raised during the execution of \"{0}\":", execPath);
-                throw;
-            }
-            finally
-            {
-                if (!process.HasExited)
-                {
-                    NodeLogger.WarnFormat(
-                        "The process [{0}] isn't finished correctly -> force the process to exit now", process.StartInfo.FileName);
-                    process.Kill();
-                }
-            }
-
-            SendAndLogMessage("{0} tool processing took {1}.", execPath, StringHelper.GetDisplayString(timer.Elapsed));
-
-        }
-        #endregion
 
     }
 
