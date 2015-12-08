@@ -1,0 +1,289 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{163029D1-129E-4875-86DA-6640145424D9}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>OpenMS.AdapterNodes</RootNamespace>
+    <AssemblyName>OpenMS.MetaboProfiler</AssemblyName>
+    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\..\..\..\Program Files\Thermo\Compound Discoverer 2.0\bin\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x64</PlatformTarget>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>..\MetX\Platform\bin_x64\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="log4net">
+      <HintPath>..\MetX\Platform\bin_x64\Release\log4net.dll</HintPath>
+    </Reference>
+    <Reference Include="PresentationCore" />
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+    <Reference Include="Thermo.CD.DataReviewModule, Version=2.0.0.271, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Program Files\Thermo\Compound Discoverer 2.0\bin\Thermo.CD.DataReviewModule.dll</HintPath>
+    </Reference>
+    <Reference Include="Thermo.Composite.WPF, Version=2.0.0.271, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Program Files\Thermo\Compound Discoverer 2.0\bin\Thermo.Composite.WPF.dll</HintPath>
+    </Reference>
+    <Reference Include="Thermo.Discoverer.Infrastructure.CommonControls, Version=2.0.0.271, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Program Files\Thermo\Compound Discoverer 2.0\bin\Thermo.Discoverer.Infrastructure.CommonControls.dll</HintPath>
+    </Reference>
+    <Reference Include="Thermo.Discoverer.Infrastructure.NodeParameters, Version=2.0.0.271, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Program Files\Thermo\Compound Discoverer 2.0\bin\Thermo.Discoverer.Infrastructure.NodeParameters.dll</HintPath>
+    </Reference>
+    <Reference Include="Thermo.Discoverer.Infrastructure.WinControls, Version=1.0.16.1436, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Program Files\Thermo\Compound Discoverer 2.0\bin\Thermo.Discoverer.Infrastructure.WinControls.dll</HintPath>
+    </Reference>
+    <Reference Include="Thermo.Discoverer.Infrastructure.ZedGraphDataPlotControl, Version=1.0.22.1058, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Program Files\Thermo\Compound Discoverer 2.0\bin\Thermo.Discoverer.Infrastructure.ZedGraphDataPlotControl.dll</HintPath>
+    </Reference>
+    <Reference Include="Thermo.Discoverer.StudyManagement.Controls, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Program Files\Thermo\Compound Discoverer 2.0\bin\Thermo.Discoverer.StudyManagement.Controls.dll</HintPath>
+    </Reference>
+    <Reference Include="Thermo.Licenses.FLEXnetOperations, Version=1.0.0.23, Culture=neutral, PublicKeyToken=06a0a350d5aad322, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Program Files\Thermo\Compound Discoverer 2.0\bin\Thermo.Licenses.FLEXnetOperations.dll</HintPath>
+    </Reference>
+    <Reference Include="Thermo.Magellan.BL.Data, Version=1.0.16.1436, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Program Files\Thermo\Compound Discoverer 2.0\bin\Thermo.Magellan.BL.Data.dll</HintPath>
+    </Reference>
+    <Reference Include="Thermo.Magellan.BL.Jobs, Version=1.0.16.1436, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Program Files\Thermo\Compound Discoverer 2.0\bin\Thermo.Magellan.BL.Jobs.dll</HintPath>
+    </Reference>
+    <Reference Include="Thermo.Magellan.BL.Processing, Version=1.0.16.1436, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Program Files\Thermo\Compound Discoverer 2.0\bin\Thermo.Magellan.BL.Processing.dll</HintPath>
+    </Reference>
+    <Reference Include="Thermo.Magellan.BL.Processing.Interfaces, Version=1.0.16.1436, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Program Files\Thermo\Compound Discoverer 2.0\bin\Thermo.Magellan.BL.Processing.Interfaces.dll</HintPath>
+    </Reference>
+    <Reference Include="Thermo.Magellan.BL.Reporting, Version=1.0.16.1436, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Program Files\Thermo\Compound Discoverer 2.0\bin\Thermo.Magellan.BL.Reporting.dll</HintPath>
+    </Reference>
+    <Reference Include="Thermo.Magellan.BL.Reporting.Interfaces, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Program Files\Thermo\Compound Discoverer 2.0\bin\Thermo.Magellan.BL.Reporting.Interfaces.dll</HintPath>
+    </Reference>
+    <Reference Include="Thermo.Magellan.BL.ReportingData, Version=1.0.16.1436, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Program Files\Thermo\Compound Discoverer 2.0\bin\Thermo.Magellan.BL.ReportingData.dll</HintPath>
+    </Reference>
+    <Reference Include="Thermo.Magellan.BL.ReportProcessing, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Program Files\Thermo\Compound Discoverer 2.0\bin\Thermo.Magellan.BL.ReportProcessing.dll</HintPath>
+    </Reference>
+    <Reference Include="Thermo.Magellan.Core, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Program Files\Thermo\Compound Discoverer 2.0\bin\Thermo.Magellan.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Thermo.Magellan.DataAccess, Version=1.0.16.1436, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Program Files\Thermo\Compound Discoverer 2.0\bin\Thermo.Magellan.DataAccess.dll</HintPath>
+    </Reference>
+    <Reference Include="Thermo.Magellan.DataLayer.FileIO, Version=1.0.16.1436, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Program Files\Thermo\Compound Discoverer 2.0\bin\Thermo.Magellan.DataLayer.FileIO.dll</HintPath>
+    </Reference>
+    <Reference Include="Thermo.Magellan.Discoverer.Models, Version=1.0.16.1436, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Program Files\Thermo\Compound Discoverer 2.0\bin\Thermo.Magellan.Discoverer.Models.dll</HintPath>
+    </Reference>
+    <Reference Include="Thermo.Magellan.Discoverer.Views, Version=1.0.16.1436, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Program Files\Thermo\Compound Discoverer 2.0\bin\Thermo.Magellan.Discoverer.Views.dll</HintPath>
+    </Reference>
+    <Reference Include="Thermo.Magellan.EntityDataFramework, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Program Files\Thermo\Compound Discoverer 2.0\bin\Thermo.Magellan.EntityDataFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="Thermo.Magellan.Exceptions, Version=1.0.16.1436, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Program Files\Thermo\Compound Discoverer 2.0\bin\Thermo.Magellan.Exceptions.dll</HintPath>
+    </Reference>
+    <Reference Include="Thermo.Magellan.MassSpec, Version=1.0.16.1436, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Program Files\Thermo\Compound Discoverer 2.0\bin\Thermo.Magellan.MassSpec.dll</HintPath>
+    </Reference>
+    <Reference Include="Thermo.Magellan.Math, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Program Files\Thermo\Compound Discoverer 2.0\bin\Thermo.Magellan.Math.dll</HintPath>
+    </Reference>
+    <Reference Include="Thermo.Magellan.PL.ClientGateway, Version=1.0.16.1436, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Program Files\Thermo\Compound Discoverer 2.0\bin\Thermo.Magellan.PL.ClientGateway.dll</HintPath>
+    </Reference>
+    <Reference Include="Thermo.Magellan.PL.ClientGateway.Interfaces, Version=1.0.16.1436, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Program Files\Thermo\Compound Discoverer 2.0\bin\Thermo.Magellan.PL.ClientGateway.Interfaces.dll</HintPath>
+    </Reference>
+    <Reference Include="Thermo.Magellan.ProcessingService.Interfaces, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Program Files\Thermo\Compound Discoverer 2.0\bin\Thermo.Magellan.ProcessingService.Interfaces.dll</HintPath>
+    </Reference>
+    <Reference Include="Thermo.Magellan.Proteomics, Version=1.0.16.1436, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Program Files\Thermo\Compound Discoverer 2.0\bin\Thermo.Magellan.Proteomics.dll</HintPath>
+    </Reference>
+    <Reference Include="Thermo.Magellan.Resources, Version=1.0.16.1436, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Program Files\Thermo\Compound Discoverer 2.0\bin\Thermo.Magellan.Resources.dll</HintPath>
+    </Reference>
+    <Reference Include="Thermo.Magellan.RetrieverNodes, Version=1.0.16.1436, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Program Files\Thermo\Compound Discoverer 2.0\bin\Thermo.Magellan.RetrieverNodes.dll</HintPath>
+    </Reference>
+    <Reference Include="Thermo.Magellan.Server.Configuration, Version=1.0.16.1436, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Program Files\Thermo\Compound Discoverer 2.0\bin\Thermo.Magellan.Server.Configuration.dll</HintPath>
+    </Reference>
+    <Reference Include="Thermo.Magellan.Services, Version=1.0.5799.3238, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Program Files\Thermo\Compound Discoverer 2.0\bin\Thermo.Magellan.Services.dll</HintPath>
+    </Reference>
+    <Reference Include="Thermo.Magellan.Services.Interfaces, Version=1.0.5799.3235, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Program Files\Thermo\Compound Discoverer 2.0\bin\Thermo.Magellan.Services.Interfaces.dll</HintPath>
+    </Reference>
+    <Reference Include="Thermo.Magellan.StudyManagement, Version=2.0.0.0, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Program Files\Thermo\Compound Discoverer 2.0\bin\Thermo.Magellan.StudyManagement.dll</HintPath>
+    </Reference>
+    <Reference Include="Thermo.Magellan.Utilities, Version=1.0.16.1436, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Program Files\Thermo\Compound Discoverer 2.0\bin\Thermo.Magellan.Utilities.dll</HintPath>
+    </Reference>
+    <Reference Include="Thermo.Metabolism.Algorithms, Version=2.0.0.271, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Program Files\Thermo\Compound Discoverer 2.0\bin\Thermo.Metabolism.Algorithms.dll</HintPath>
+    </Reference>
+    <Reference Include="Thermo.Metabolism.CommonNodes, Version=2.0.0.271, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Program Files\Thermo\Compound Discoverer 2.0\bin\Thermo.Metabolism.CommonNodes.dll</HintPath>
+    </Reference>
+    <Reference Include="Thermo.Metabolism.DataObjects, Version=2.0.0.271, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Program Files\Thermo\Compound Discoverer 2.0\bin\Thermo.Metabolism.DataObjects.dll</HintPath>
+    </Reference>
+    <Reference Include="Thermo.Metabolism.DetectorNodes, Version=2.0.0.271, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Program Files\Thermo\Compound Discoverer 2.0\bin\Thermo.Metabolism.DetectorNodes.dll</HintPath>
+    </Reference>
+    <Reference Include="Thermo.Metabolism.DL.DataAccess, Version=2.0.0.271, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Program Files\Thermo\Compound Discoverer 2.0\bin\Thermo.Metabolism.DL.DataAccess.dll</HintPath>
+    </Reference>
+    <Reference Include="Thermo.Metabolism.DomainObjects, Version=2.0.0.271, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Program Files\Thermo\Compound Discoverer 2.0\bin\Thermo.Metabolism.DomainObjects.dll</HintPath>
+    </Reference>
+    <Reference Include="Thermo.Metabolism.Processing.Common, Version=2.0.0.271, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Program Files\Thermo\Compound Discoverer 2.0\bin\Thermo.Metabolism.Processing.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="Thermo.Metabolism.Processing.Services, Version=2.0.0.271, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Program Files\Thermo\Compound Discoverer 2.0\bin\Thermo.Metabolism.Processing.Services.dll</HintPath>
+    </Reference>
+    <Reference Include="Thermo.Metabolism.Processing.Services.Interfaces, Version=2.0.0.271, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Program Files\Thermo\Compound Discoverer 2.0\bin\Thermo.Metabolism.Processing.Services.Interfaces.dll</HintPath>
+    </Reference>
+    <Reference Include="Thermo.Metabolism.Services, Version=2.0.0.271, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Program Files\Thermo\Compound Discoverer 2.0\bin\Thermo.Metabolism.Services.dll</HintPath>
+    </Reference>
+    <Reference Include="Thermo.Metabolism.Services.HighChemInterOp, Version=2.0.0.271, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Program Files\Thermo\Compound Discoverer 2.0\bin\Thermo.Metabolism.Services.HighChemInterOp.dll</HintPath>
+    </Reference>
+    <Reference Include="Thermo.Metabolism.Services.Interfaces, Version=2.0.0.271, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Program Files\Thermo\Compound Discoverer 2.0\bin\Thermo.Metabolism.Services.Interfaces.dll</HintPath>
+    </Reference>
+    <Reference Include="Thermo.Metabolism.Services.Web, Version=2.0.0.271, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Program Files\Thermo\Compound Discoverer 2.0\bin\Thermo.Metabolism.Services.Web.dll</HintPath>
+    </Reference>
+    <Reference Include="Thermo.Vendors.MassFrontier.Server.Interfaces, Version=2.0.0.271, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Program Files\Thermo\Compound Discoverer 2.0\bin\Thermo.Vendors.MassFrontier.Server.Interfaces.dll</HintPath>
+    </Reference>
+    <Reference Include="ThermoFisher.CE.Data, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Program Files\Thermo\Compound Discoverer 2.0\bin\ThermoFisher.CE.Data.dll</HintPath>
+    </Reference>
+    <Reference Include="ThermoFisher.CommonCore.Element, Version=3.0.29.0, Culture=neutral, PublicKeyToken=1aef06afb5abd953, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Program Files\Thermo\Compound Discoverer 2.0\bin\ThermoFisher.CommonCore.Element.dll</HintPath>
+    </Reference>
+    <Reference Include="ThermoFisher.CommonCore.PeakDetect, Version=3.0.29.0, Culture=neutral, PublicKeyToken=1aef06afb5abd953, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Program Files\Thermo\Compound Discoverer 2.0\bin\ThermoFisher.CommonCore.PeakDetect.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="OpenMSFeatureFinderNodeMassSpectra.cs" />
+    <Compile Include="OpenMSFeatureFinderNodeTools.cs" />
+    <Compile Include="OpenMSFeatureFinderNode.cs" />
+    <Compile Include="UnknownFeatureIonInstanceItem.cs" />
+    <Compile Include="UnknownFeatureInstanceItemChromatogramChartDataProvider.cs" />
+    <Compile Include="TracePointSumClass.cs" />
+    <Compile Include="UnknownFeatureConsolidationProvider.cs" />
+    <Compile Include="OpenMSFile.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="UnknownFeatureIonInstanceSpectrumChartDataProvider.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

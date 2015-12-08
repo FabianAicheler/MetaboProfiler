@@ -124,6 +124,22 @@ namespace OpenMS.AdapterNodes
 			PlotType = PlotType.Numeric)]
 		public double RetentionTime { get; set; }
 
+        /// <summary>
+        /// Gets or sets the peak FWHM in minutes.
+        /// </summary> 				
+        [EntityProperty(
+            DisplayName = "FWHM [min]",
+            Description = "Peak width in its half-height in minutes",
+            FormatString = "0.000",
+            DataPurpose = CDEntityDataPurpose.FWHM)]
+        [GridDisplayOptions(
+            DataVisibility = GridVisibility.Hidden,
+            VisiblePosition = 600,
+            TextHAlign = GridCellHAlign.Right)]
+        [PlottingOptions(
+            PlotType = PlotType.Numeric)]
+        public double? FWHM { get; set; }
+
 		/// <summary>
 		///	Gets or sets the number of theoretical isotopes matched in measured spectrum.
 		/// </summary>				
@@ -146,7 +162,7 @@ namespace OpenMS.AdapterNodes
 			DisplayName = "Intensity",
 			Description = "Max apex intensity of all related peaks per input file",
 			FormatString = "0",
-			DataPurpose = CDEntityDataPurpose.PeakIntensityMax)]
+			DataPurpose = CDEntityDataPurpose.IntensityMax)]
 		[GridDisplayOptions(
 			VisiblePosition = 700,
 			ColumnWidth = 100,
@@ -163,7 +179,7 @@ namespace OpenMS.AdapterNodes
 			DisplayName = "Area",
 			Description = "Summed area of all related peaks per input file",
 			FormatString = "0",
-			DataPurpose = CDEntityDataPurpose.PeakAreaSum)]
+			DataPurpose = CDEntityDataPurpose .AreaSum)]
 		[GridDisplayOptions(
 			VisiblePosition = 800,
 			ColumnWidth = 100,
@@ -239,5 +255,6 @@ namespace OpenMS.AdapterNodes
 				Area,
 				NumberOfMatchedIsotopes);
 		}
+
     }
 }

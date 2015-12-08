@@ -149,7 +149,7 @@ namespace OpenMS.AdapterNodes
 			SendAndLogTemporaryMessage("Building spectral trees...");
 			var timer = Stopwatch.StartNew();
 
-			DetectedPeakDetailsHelper.AssignSpectrumTreesToPeakDetails(spectrumDescriptors.OfType<ISpectrumDescriptor>(), peakDetails, MassTolerance.Value);
+			DetectedPeakDetailsHelper.AssignSpectrumTreesToPeakDetails(spectrumDescriptors.OfType<ISpectrumDescriptor>(), peakDetails);
 
 			timer.Stop();
 			SendAndLogMessage("Building spectral trees takes {0:F2} s.", timer.Elapsed.TotalSeconds);
