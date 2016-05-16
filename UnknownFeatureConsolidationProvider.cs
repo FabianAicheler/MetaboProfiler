@@ -23,9 +23,7 @@ namespace OpenMS.AdapterNodes
     #region Implement logic for Consolidation of UnknownFeatureInstanceItems
     public class UnknownFeatureConsolidationProvider : PeakConsolidationProvider<UnknownFeatureIonInstanceItem>
     {
-
 	    private Dictionary<ulong, Centroid> m_dict;
-
 
 		public UnknownFeatureConsolidationProvider(Dictionary<ulong, Centroid> consensusDict, int processingNodeNumber, string processingNodeName, IEntityDataService entityDataService)
             : base(processingNodeNumber, processingNodeName, entityDataService)
@@ -37,9 +35,6 @@ namespace OpenMS.AdapterNodes
         {
             // init container
             var componentPeaks = new List<ConsolidatedComponentPeak>();
-
-			
-
 	        // get entity reader
             var entityReader = EntityDataService.CreateEntityItemReader();
 

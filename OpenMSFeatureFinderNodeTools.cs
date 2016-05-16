@@ -127,7 +127,7 @@ namespace OpenMS.AdapterNodes
         }
 
         //Write ITEMLISTs, used for input or output file lists
-        private static void writeItemList(string[] vars, string ini_path, string mode)
+        private static void replaceItemList(string[] vars, string ini_path, string mode)
         {
             XmlDocument doc = new XmlDocument();
             doc.Load(ini_path);
@@ -137,6 +137,13 @@ namespace OpenMS.AdapterNodes
                 //mode: in or out?
                 if (item.Attributes["name"].Value == mode)
                 {
+                    //we want to remove e.g. H+:0.9
+                    //XmlAttributeCollection attributes = item.Attributes.;
+                    //item.RemoveAll();
+                    //((XmlElement) item).IsEmpty = true;
+                    while (item.FirstChild != null){
+                        item.RemoveChild(item.FirstChild);
+                    }
                     foreach (var fn in vars)
                     {
                         //We add LISTITEMS to until then empty ITEMLISTS
@@ -144,7 +151,7 @@ namespace OpenMS.AdapterNodes
                         XmlAttribute newAttribute = doc.CreateAttribute("value");
                         newAttribute.Value = fn;
                         listitem.SetAttributeNode(newAttribute);
-                        item.AppendChild(listitem);
+                        item.AppendChild(listitem);                        
                     }
                 }
             }

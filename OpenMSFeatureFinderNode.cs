@@ -100,7 +100,7 @@ namespace OpenMS.AdapterNodes
 
         private int m_currentStep;
         private int m_numSteps;
-        private int m_numFiles;
+        private int m_numFiles; 
 		private readonly SpectrumDescriptorCollection m_spectrumDescriptors = new SpectrumDescriptorCollection();
 	    private ConsensusXMLFile m_consensusXML;
 	    private List<WorkflowInputFile> m_workflowInputFiles;
@@ -121,7 +121,7 @@ namespace OpenMS.AdapterNodes
         [DoubleParameter(Category = "1. Feature Finding",
             DisplayName = "Noise Threshold",
             Description = "This parameter specifies the intensity threshold below which peaks are rejected as noise.",
-            DefaultValue = "1000")]
+            DefaultValue = "10000")] //10000 based on observed intensities in instrument data
         public DoubleParameter NoiseThreshold;
 
         //[StringSelectionParameter(Category = "1. Metabolite Feature Finding", /// Accurate Mass Search",
@@ -472,7 +472,7 @@ namespace OpenMS.AdapterNodes
                             {"out", outvars[i]},
                             {"mass_error_ppm", masserror},
                             {"noise_threshold_int", NoiseThreshold.ToString()},
-                            {"trace_termination_outliers", "2"}};
+                            {"trace_termination_outliers", "2"}}; //personal preference after looking at some mzML data for Thermo instruments (vs 3; 5)
                 
 
                 ini_path = Path.Combine(NodeScratchDirectory, @"FeatureFinderMetaboDefault.ini");
@@ -531,8 +531,8 @@ namespace OpenMS.AdapterNodes
                     ini_path = Path.Combine(NodeScratchDirectory, @"MapAlignerPoseClusteringDefault.ini");
                     create_default_ini(execPath, ini_path);
                     WriteItem(ini_path, map_parameters);
-                    writeItemList(invars, ini_path, "in");
-                    writeItemList(outvars, ini_path, "out");
+                    replaceItemList(invars, ini_path, "in");
+                    replaceItemList(outvars, ini_path, "out");
                     write_MZ_RT_thresholds(ini_path);
                     SendAndLogMessage("Starting MapAlignerPoseClustering");
                     RunTool(execPath, ini_path);
@@ -566,12 +566,74 @@ namespace OpenMS.AdapterNodes
                 ini_path = Path.Combine(NodeScratchDirectory, @"FeatureLinkerUnlabeledQTDefault.ini");
                 create_default_ini(execPath, ini_path);
                 WriteItem(ini_path, fl_unlabeled_parameters);
-                writeItemList(invars, ini_path, "in");
+                replaceItemList(invars, ini_path, "in");
                 write_MZ_RT_thresholds(ini_path);
                 SendAndLogMessage("FeatureLinkerUnlabeledQT");
                 RunTool(execPath, ini_path);
                 m_currentStep += m_numFiles;
                 ReportTotalProgress((double)m_currentStep / m_numSteps);
+            }
+
+            //decharging of consensus file(s)
+            //TODO: add toggle
+            if (true)
+            {
+                //in all cases, we get a consensusXML here, but Decharger requires featureXML
+                //We do conversion even for featureXML to consensus to feature to remove hulls from information for Decharger
+                //in theory also possible to ignore convex hull if hull similarity set to 0 in Decharger
+                {
+                    invars[0] = m_consensusXML.get_name();
+                    outvars[0] = Path.Combine(Path.GetDirectoryName(invars[0]),
+                        Path.GetFileNameWithoutExtension(invars[0])) +
+                        "_decharged_in.featureXML";
+                    execPath = Path.Combine(openMSdir, @"bin/FileConverter.exe");
+                    Dictionary<string, string> convert_parameters = new Dictionary<string, string> {
+                            {"in", invars[0]},
+                            {"in_type", "consensusXML"},
+                            {"out", outvars[0]},
+                            {"out_type", "featureXML"}};
+
+
+                    ini_path = Path.Combine(NodeScratchDirectory, @"FileConverterDefault.ini");
+                    create_default_ini(execPath, ini_path);
+                    WriteItem(ini_path, convert_parameters);
+                    RunTool(execPath, ini_path);
+                }
+                {
+                    //is featureXml. now decharge
+                    //output will be featurexml with features (== consensus) annotated with adduct and consensusfile with pair information
+                    invars[0] = outvars[0];
+                    //m_consensusXML = new ConsensusXMLFile(outvars[0]);
+                   String out_cm = Path.Combine(Path.GetDirectoryName(invars[0]),
+                        Path.GetFileNameWithoutExtension(invars[0])) +
+                        "_decharged_cm.consensusXML";
+                   String out_fm = Path.Combine(Path.GetDirectoryName(invars[0]),
+                       Path.GetFileNameWithoutExtension(invars[0])) +
+                       "_decharged_fm.featureXML";
+                   String out_pairs = Path.Combine(Path.GetDirectoryName(invars[0]),
+                       Path.GetFileNameWithoutExtension(invars[0])) +
+                       "_decharged_outpairs.consensusXML";
+                    execPath = Path.Combine(openMSdir, @"bin/Decharger.exe");
+                    Dictionary<string, string> decharge_parameters = new Dictionary<string, string> {
+                            {"in", invars[0]},
+                            {"out_cm", out_cm},
+                            {"out_fm", out_fm},
+                            {"outpairs", out_pairs},
+                            {"charge_min", "1"},
+                            {"charge_max", "1"},
+                            {"charge_span_max", "1"},
+                            {"retention_max_diff", "1"},
+                            {"retention_max_diff_local", "1"},
+                            {"mass_max_diff", "0.01"},
+                            //{"out", outvars[0]},
+                            {"out_type", "consensusXML"}};
+                    //out_cm ...
+                    ini_path = Path.Combine(NodeScratchDirectory, @"DechargerDefault.ini");
+                    create_default_ini(execPath, ini_path);
+                    WriteItem(ini_path, decharge_parameters);
+                    replaceItemList(new String[]{"H+:0.6", "Na+:0.3", "K+:0.1"}, ini_path, "potential_adducts");
+                    RunTool(execPath, ini_path);
+                }
             }
 
 
