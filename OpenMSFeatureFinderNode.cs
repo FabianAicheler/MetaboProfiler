@@ -992,12 +992,9 @@ namespace OpenMS.AdapterNodes
                 //might read mass?
                 var elements = new List<ulong>();
                 ulong cent_id = Convert.ToUInt64(consensusElement.Attributes["id"].Value.Substring(2));
-
-                var unknownCompoundInstanceItem = new UnknownCompoundInstanceItem()
-                {
-                    ID = EntityDataService.NextId<UnknownCompoundInstanceItem>(),
-                    NumberOfAdducts = elements.Count
-                };
+                var centroid = consensusElement.SelectSingleNode(@"./centroid");
+                var rt = Double.Parse(centroid.Attributes["rt"].Value)/60.0;
+                var mz = Double.Parse(centroid.Attributes["mz"].Value);
                 var ions = new List<UnknownFeatureIonInstanceItem>();
                 foreach (XmlNode element in consensusElement.GetElementsByTagName("element")){
                     var fid = Convert.ToUInt64(element.Attributes["id"].Value);//already only number here
@@ -1009,6 +1006,14 @@ namespace OpenMS.AdapterNodes
                         //connection compound<->ion?
                     }
                 }
+                var a = new UnknownCompoundItem();
+                var unknownCompoundInstanceItem = new UnknownCompoundInstanceItem()
+                {
+                    ID = EntityDataService.NextId<UnknownCompoundInstanceItem>(),
+                    MolecularWeight = mz,
+                    RetentionTime = rt,
+                    NumberOfAdducts = elements.Count
+                };
                 //m_dc_to_cons_dict.Add(cent_id, elements);
                 dict.Add(unknownCompoundInstanceItem, ions);
             }
