@@ -483,7 +483,9 @@ namespace OpenMS.AdapterNodes
 		/// </summary>
 		private void AddDatabaseIndices()
 		{
-			EntityDataService.CreateIndex<UnknownFeatureIonInstanceItem>();
+            EntityDataService.CreateIndex<OpenMSUnknownCompoundInstanceItem>();                       
+            EntityDataService.CreateIndex<UnknownFeatureIonInstanceItem>();
+
 			EntityDataService.CreateIndex<ChromatogramPeakItem>();
 			EntityDataService.CreateIndex<XicTraceItem>();
 			EntityDataService.CreateIndex<MassSpectrumItem>();
@@ -976,10 +978,13 @@ namespace OpenMS.AdapterNodes
 	        return featureIonToPeaks;
         }
 
+//        private Dictionary<UnknownCompoundInstanceItem, List<UnknownFeatureIonInstanceItem>> CreateCompounds2Ions(Dictionary<UnknownFeatureIonInstanceItem, List<ChromatogramPeakItem>>.KeyCollection featureIons)
         
-        private Dictionary<UnknownCompoundInstanceItem, List<UnknownFeatureIonInstanceItem>> CreateCompounds2Ions(Dictionary<UnknownFeatureIonInstanceItem, List<ChromatogramPeakItem>>.KeyCollection featureIons)
+        private Dictionary<OpenMSUnknownCompoundInstanceItem, List<UnknownFeatureIonInstanceItem>> CreateCompounds2Ions(Dictionary<UnknownFeatureIonInstanceItem, List<ChromatogramPeakItem>>.KeyCollection featureIons)
         {
-            var dict = new Dictionary<UnknownCompoundInstanceItem, List<UnknownFeatureIonInstanceItem>>();
+            //var dict = new Dictionary<UnknownCompoundInstanceItem, List<UnknownFeatureIonInstanceItem>>();
+            var dict = new Dictionary<OpenMSUnknownCompoundInstanceItem, List<UnknownFeatureIonInstanceItem>>();
+
             var id_to_ion = new Dictionary<ulong, UnknownFeatureIonInstanceItem>();
             foreach (UnknownFeatureIonInstanceItem featureIon in featureIons){
                 id_to_ion.Add(Convert.ToUInt64(featureIon.FeatureID), featureIon);
@@ -1005,16 +1010,24 @@ namespace OpenMS.AdapterNodes
                         //connection compound<->ion?
                     }
                 }
-                var a = new UnknownCompoundItem();
-                var unknownCompoundInstanceItem = new UnknownCompoundInstanceItem()
+
+                //var unknownCompoundInstanceItem = new UnknownCompoundInstanceItem()
+                //{
+                //    ID = EntityDataService.NextId<UnknownCompoundInstanceItem>(),
+                //    MolecularWeight = mz,
+                //    RetentionTime = rt,
+                //    NumberOfAdducts = elements.Count
+                //};                
+                var openMSUnknownCompoundInstanceItem = new OpenMSUnknownCompoundInstanceItem()
                 {
-                    ID = EntityDataService.NextId<UnknownCompoundInstanceItem>(),
+                    ID = EntityDataService.NextId<OpenMSUnknownCompoundInstanceItem>(),
                     MolecularWeight = mz,
                     RetentionTime = rt,
                     NumberOfAdducts = elements.Count
                 };
                 //m_dc_to_cons_dict.Add(cent_id, elements);
-                dict.Add(unknownCompoundInstanceItem, ions);
+                //dict.Add(unknownCompoundInstanceItem, ions);
+                dict.Add(openMSUnknownCompoundInstanceItem, ions);
             }
             return dict;
         }
@@ -1024,9 +1037,7 @@ namespace OpenMS.AdapterNodes
 		/// </summary>
 		private void RegisterEntityObjectTypes()
 		{
-			// register items
 			EntityDataService.RegisterEntity<UnknownFeatureIonInstanceItem>(ProcessingNodeNumber);
-            EntityDataService.RegisterEntity<UnknownCompoundInstanceItem>(ProcessingNodeNumber);
 
 			EntityDataService.RegisterEntity<XicTraceItem>(ProcessingNodeNumber);
 			EntityDataService.RegisterEntity<ChromatogramPeakItem>(ProcessingNodeNumber);
@@ -1036,12 +1047,13 @@ namespace OpenMS.AdapterNodes
 			// register basic connections                        
             EntityDataService.RegisterEntityConnection<UnknownFeatureIonInstanceItem, WorkflowInputFile>(ProcessingNodeNumber);
             EntityDataService.RegisterEntityConnection<UnknownFeatureIonInstanceItem, ChromatogramPeakItem>(ProcessingNodeNumber);
+            EntityDataService.RegisterEntityConnection<UnknownFeatureIonInstanceItem, XicTraceItem>(ProcessingNodeNumber);
 
-            EntityDataService.RegisterEntityConnection<UnknownCompoundInstanceItem, UnknownFeatureIonInstanceItem>(ProcessingNodeNumber);
-            //EntityDataService.RegisterEntityConnection<UnknownCompoundInstanceItem, UnknownCompoundIonInstanceItem>(ProcessingNodeNumber);
+            // visualiation of decharged
+            EntityDataService.RegisterEntity<OpenMSUnknownCompoundInstanceItem>(ProcessingNodeNumber);
+            EntityDataService.RegisterEntityConnection<OpenMSUnknownCompoundInstanceItem, UnknownFeatureIonInstanceItem>(ProcessingNodeNumber);
 
             EntityDataService.RegisterEntityConnection<ChromatogramPeakItem, MassSpectrumItem>(ProcessingNodeNumber);
-			EntityDataService.RegisterEntityConnection<UnknownFeatureIonInstanceItem, XicTraceItem>(ProcessingNodeNumber);
 			EntityDataService.RegisterEntityConnection<XicTraceItem, RetentionTimeRasterItem>(ProcessingNodeNumber);
 		}
 
