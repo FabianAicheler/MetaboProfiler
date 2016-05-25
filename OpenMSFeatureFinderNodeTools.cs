@@ -38,10 +38,8 @@ namespace OpenMS.AdapterNodes
         {
             var timer = Stopwatch.StartNew();
 
-
             var ini_loc = String.Format("\"{0}\"", ini_path);
             //SendAndLogMessage(execPath + NodeScratchDirectory + ini_loc);
-
 
             var process = new Process
             {
@@ -64,15 +62,12 @@ namespace OpenMS.AdapterNodes
 
                 try
                 {
-                    //SendAndLogMessage("in try");
                     process.Refresh();
-                    //process.PriorityClass = ProcessPriorityClass.BelowNormal;//causes exception
+                    //process.PriorityClass = ProcessPriorityClass.BelowNormal;//Do not use, causes exception!
                     process.WaitForExit();
-                    //SendAndLogMessage("end try");
                 }
                 catch (InvalidOperationException ex)
                 {
-                    //SendAndLogMessage("in invalidoperation exception");
                     NodeLogger.ErrorFormat(ex, "The following exception is raised during the execution of \"{0}\":", execPath);
                     throw;
                 }
@@ -87,12 +82,10 @@ namespace OpenMS.AdapterNodes
             }
             catch (System.Threading.ThreadAbortException)
             {
-                //SendAndLogMessage("in abort throw");
                 throw;
             }
             catch (Exception ex)
             {
-                //SendAndLogMessage("in abort catch");
                 NodeLogger.ErrorFormat(ex, "The following exception is raised during the execution of \"{0}\":", execPath);
                 throw;
             }

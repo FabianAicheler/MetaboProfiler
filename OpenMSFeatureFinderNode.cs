@@ -343,7 +343,6 @@ namespace OpenMS.AdapterNodes
             //Pipeline should only be run once for all supplied files
             var featureIonToPeak = RunOpenMsPipeline(exportedList);
 
-
             foreach (var spectrumDescriptorsGroupedByFileId in m_spectrumDescriptors.GroupBy(g => g.Header.FileID))
             {
                 // Group spectra into spectrum trees.
@@ -540,7 +539,6 @@ namespace OpenMS.AdapterNodes
                             {"noise_threshold_int", NoiseThreshold.ToString()},
                             {"trace_termination_outliers", "2"}}; //personal preference after looking at some mzML data for Thermo instruments (vs 3; 5)
                 
-
                 ini_path = Path.Combine(NodeScratchDirectory, @"FeatureFinderMetaboDefault.ini");
                 create_default_ini(execPath, ini_path);
                 WriteItem(ini_path, ffm_parameters);
@@ -588,7 +586,7 @@ namespace OpenMS.AdapterNodes
 
                     Dictionary<string, string> map_parameters = new Dictionary<string, string> {
                     {"max_num_peaks_considered", "10000"},
-                    {"ignore_charge", "true"}};
+                    {"ignore_charge", "true"}};//expect false charges to average out -> linear majority align
                     ini_path = Path.Combine(NodeScratchDirectory, @"MapAlignerPoseClusteringDefault.ini");
                     create_default_ini(execPath, ini_path);
                     WriteItem(ini_path, map_parameters);
@@ -618,7 +616,7 @@ namespace OpenMS.AdapterNodes
 
                 execPath = Path.Combine(openMSdir, @"bin/FeatureLinkerUnlabeledQT.exe");
                 Dictionary<string, string> fl_unlabeled_parameters = new Dictionary<string, string> {
-                        {"ignore_charge", "true"},
+                        {"ignore_charge", "false"},//expect more correct charges from orbi data than for lower quality data
                         {"out", outvars[0]}};
                 ini_path = Path.Combine(NodeScratchDirectory, @"FeatureLinkerUnlabeledQTDefault.ini");
                 create_default_ini(execPath, ini_path);
@@ -962,6 +960,7 @@ namespace OpenMS.AdapterNodes
             EntityDataService.InsertItems(compoundToFeatureIon.Keys);
             EntityDataService.InsertItems(compoundToFeatureIon.Values.SelectMany(s => s));
             EntityDataService.ConnectItems(compoundToFeatureIon.Select(s => Tuple.Create(s.Key, s.Value.AsEnumerable())));
+            //EntityDataService.ConnectItems(compoundToFeatureIon.Select(s => Tuple.Create(s.Key, s.Value.AsEnumerable())));
 
 
             // Get workflow input file and connect all components to the input file
@@ -1039,6 +1038,7 @@ namespace OpenMS.AdapterNodes
             EntityDataService.RegisterEntityConnection<UnknownFeatureIonInstanceItem, ChromatogramPeakItem>(ProcessingNodeNumber);
 
             EntityDataService.RegisterEntityConnection<UnknownCompoundInstanceItem, UnknownFeatureIonInstanceItem>(ProcessingNodeNumber);
+            //EntityDataService.RegisterEntityConnection<UnknownCompoundInstanceItem, UnknownCompoundIonInstanceItem>(ProcessingNodeNumber);
 
             EntityDataService.RegisterEntityConnection<ChromatogramPeakItem, MassSpectrumItem>(ProcessingNodeNumber);
 			EntityDataService.RegisterEntityConnection<UnknownFeatureIonInstanceItem, XicTraceItem>(ProcessingNodeNumber);
