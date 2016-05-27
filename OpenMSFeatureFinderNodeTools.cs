@@ -28,7 +28,7 @@ using Thermo.Metabolism.DataObjects.Constants;
 namespace OpenMS.AdapterNodes
 {
 
-    public partial class OpenMSFeatureFinderNode : ProcessingNode<UnknownFeatureConsolidationProvider, ConsensusXMLFile>,
+    public partial class OpenMSMetaboProfilerNode : ProcessingNode<UnknownFeatureConsolidationProvider, ConsensusXMLFile>,
         IResultsSink<MassSpectrumCollection>
 	{
 
@@ -178,7 +178,7 @@ namespace OpenMS.AdapterNodes
         }
 
         //execute specific OpenMS Tool (execPath) with specified Ini (ParamPath)        
-        private void RunTool(string execPath, string ParamPath)
+        private void RunTool(string execPath, string ParamPath, bool mute = false)
         {
 
             var timer = Stopwatch.StartNew();
@@ -222,6 +222,9 @@ namespace OpenMS.AdapterNodes
                     {
                         var output = process.StandardOutput.ReadLine();
 
+                        if (mute) {
+                            continue;
+                        }
 
                         // move on if no new announcement. 
                         if (String.IsNullOrEmpty(output))
@@ -273,14 +276,15 @@ namespace OpenMS.AdapterNodes
                     using (var reader = new StringReader(process.StandardOutput.ReadToEnd()))
                     {
                         string output;
-
-                        while ((output = reader.ReadLine()) != null)
-                        {
-                            WriteLogMessage(MessageLevel.Debug, output);
-
-                            if (String.IsNullOrEmpty(output) == false)
+                        if (!mute){
+                            while ((output = reader.ReadLine()) != null)
                             {
-                                SendAndLogMessage(output, false);
+                                WriteLogMessage(MessageLevel.Debug, output);
+
+                                if (String.IsNullOrEmpty(output) == false)
+                                {
+                                    SendAndLogMessage(output, false);
+                                }
                             }
                         }
                     }

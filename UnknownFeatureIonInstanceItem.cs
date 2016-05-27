@@ -1,9 +1,4 @@
-﻿//-----------------------------------------------------------------------------
-// Copyright (c) 2013, Thermo Fisher Scientific
-// All rights reserved
-//-----------------------------------------------------------------------------
-
-using System;
+﻿using System;
 using Thermo.Magellan.BL.Data;
 using Thermo.Magellan.EntityDataFramework;
 using Thermo.Magellan.MassSpec;
@@ -89,7 +84,8 @@ namespace OpenMS.AdapterNodes
 			DataPurpose = CDEntityDataPurpose.MolecularWeight)]
 		[GridDisplayOptions(
 			VisiblePosition = 300,
-			TextHAlign = GridCellHAlign.Right)]
+			TextHAlign = GridCellHAlign.Right,
+            DataVisibility = GridVisibility.Hidden)]
 		[PlottingOptions(
 			PlotType = PlotType.Numeric)]
 		public double MolecularWeight { get; set; }
@@ -99,7 +95,7 @@ namespace OpenMS.AdapterNodes
 		/// </summary>		
 		[EntityProperty(
 			DisplayName = "m/z",
-			Description = "Measured ion mass",
+			Description = "Measured ion mass over charge",
 			FormatString = "0.00000",
 			DataPurpose = CDEntityDataPurpose.MassOverCharge)]
 		[GridDisplayOptions(
@@ -193,7 +189,7 @@ namespace OpenMS.AdapterNodes
 		/// </summary>		
 		[EntityProperty(
 			DisplayName = "File ID",
-			Description = "Input file ID",
+			Description = "OpenMS file ID",
 			DataPurpose = CDEntityDataPurpose.SpectrumFileID)]
 		[GridDisplayOptions(
 			VisiblePosition = 1100,
@@ -207,7 +203,8 @@ namespace OpenMS.AdapterNodes
 		/// Gets or sets the feature ID.
 		/// </summary>		
 		[EntityProperty(
-			DisplayName = "FeatureID",
+			DisplayName = "Feature ID",
+            Description = "OpenMS feature ID",
 			DataPurpose = CDEntityDataPurpose.ID)]
 		[GridDisplayOptions(
 			VisiblePosition = 1200,

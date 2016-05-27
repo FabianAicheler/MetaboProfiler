@@ -12,8 +12,7 @@ using Thermo.Metabolism.DataObjects.EntityDataObjects;
 namespace OpenMS.AdapterNodes
 {
     [SpectrumChartDataProviderFactoryExport(typeof(UnknownFeatureIonInstanceItem))]
-    public class ExpectedCompoundSpectrumChartDataProviderFactory : ISpectrumChartDataProviderFactory
-    {
+    public class ExpectedCompoundSpectrumChartDataProviderFactory : ISpectrumChartDataProviderFactory{
         /// <summary>
         /// Creates the a <see cref="ISpectrumChartDataProvider" /> instance for entities of type <see cref="UnknownFeatureIonInstanceItem"/>.
         /// </summary>
@@ -22,8 +21,7 @@ namespace OpenMS.AdapterNodes
         /// <returns>
         /// A new created <see cref="ISpectrumChartDataProvider" /> instance.
         /// </returns>
-        public ISpectrumChartDataProvider Create(IEntityDataService entityDataService, IEnumerable<EntityItemData> entityItemData)
-        {
+        public ISpectrumChartDataProvider Create(IEntityDataService entityDataService, IEnumerable<EntityItemData> entityItemData){
             return new UnknownFeatureIonInstanceSpectrumChartDataProvider(entityDataService, entityItemData);
         }
     }
@@ -36,8 +34,7 @@ namespace OpenMS.AdapterNodes
         private readonly IEntityDataService m_entityDataService;
         private readonly Dictionary<int, string> m_fileNames = new Dictionary<int, string>();
 
-        public UnknownFeatureIonInstanceSpectrumChartDataProvider(IEntityDataService entityDataService, IEnumerable<EntityItemData> entityItemData)
-        {
+        public UnknownFeatureIonInstanceSpectrumChartDataProvider(IEntityDataService entityDataService, IEnumerable<EntityItemData> entityItemData){
             ArgumentHelper.AssertNotNull(entityItemData, "entityItemData");
 
             m_entityDataService = entityDataService;
@@ -70,15 +67,12 @@ namespace OpenMS.AdapterNodes
         /// <summary>
         /// Loads spectral tree for current compound.
         /// </summary>
-        private IEnumerable<MassSpectrumItemTreeNode> LoadSpectralTree()
-        {
+        private IEnumerable<MassSpectrumItemTreeNode> LoadSpectralTree(){
             // get spectra for each ion
-            if ((m_unknownFeatureIonInstanceItems != null) && (m_unknownFeatureIonInstanceItems.Any()))
-            {
+            if ((m_unknownFeatureIonInstanceItems != null) && (m_unknownFeatureIonInstanceItems.Any())){
                 // check path
                 IList<string> shortestConnectingPath;
-                if (m_entityDataService.TryGetShortestConnection<UnknownFeatureIonInstanceItem, MassSpectrumItem>(out shortestConnectingPath))
-                {
+                if (m_entityDataService.TryGetShortestConnection<UnknownFeatureIonInstanceItem, MassSpectrumItem>(out shortestConnectingPath)){
                     // init container
                     var spectra = new List<MassSpectrumItem>();
 
@@ -87,15 +81,13 @@ namespace OpenMS.AdapterNodes
                     var entityReader = m_entityDataService.CreateEntityItemReader();
 
                     // get spectra for each ion
-                    foreach (var ionInstanceItem in m_unknownFeatureIonInstanceItems)
-                    {
+                    foreach (var ionInstanceItem in m_unknownFeatureIonInstanceItems){
                         // get spectra
                         var connectedSpectra = entityReader.ReadFlat<UnknownFeatureIonInstanceItem, MassSpectrumItem>(
                             ionInstanceItem, readerSettingsT2: readerSettings);
 
                         // store spectra
-                        if (connectedSpectra != null)
-                        {
+                        if (connectedSpectra != null){
                             spectra.AddRange(connectedSpectra.Item2);
                         }
                     }
@@ -111,14 +103,12 @@ namespace OpenMS.AdapterNodes
             return Enumerable.Empty<MassSpectrumItemTreeNode>();
         }
 
-        public override SpectrumChartData CreateSpectrumDetails(MassSpectrumItem massSpectrumItem, MassSpectrum referenceSpectrum = null)
-        {
+        public override SpectrumChartData CreateSpectrumDetails(MassSpectrumItem massSpectrumItem, MassSpectrum referenceSpectrum = null){
             ArgumentHelper.AssertNotNull(massSpectrumItem, "massSpectrumItem");
 
             // clone given spectrum
             var spectrum = massSpectrumItem.Spectrum.Clone();
-            if (spectrum == null)
-            {
+            if (spectrum == null){
                 return null;
             }
 
@@ -128,14 +118,11 @@ namespace OpenMS.AdapterNodes
             //	: m_unknownFeatureIonInstanceItems.Where(w => w.Charge > 0);
 
             // annotate nearest centroids
-            foreach (var ion in m_unknownFeatureIonInstanceItems)
-            {
+            foreach (var ion in m_unknownFeatureIonInstanceItems){
                 // annotate isotopes
-                foreach (var peak in m_chromatogramPeakItemsMap[ion.GetIDs()])
-                {
+                foreach (var peak in m_chromatogramPeakItemsMap[ion.GetIDs()]){
                     var centroid = spectrum.PeakCentroids.FindClosestPeak(peak.Mass);
-                    if (centroid != null)
-                    {
+                    if (centroid != null){
                         centroid.DisplayPriority = 2;
                     }
                 }
@@ -143,14 +130,12 @@ namespace OpenMS.AdapterNodes
 
             // create spectrum chart data
             var massRange = Range.Create(spectrum.Header.LowPosition, spectrum.Header.HighPosition);
-            if (spectrum.ScanEvent.MSOrder == MSOrderType.MS1)
-            {
+            if (spectrum.ScanEvent.MSOrder == MSOrderType.MS1){
                 var peaks = m_chromatogramPeakItemsMap.SelectMany(s => s.Value).ToList();
                 massRange = Range.Create(Math.Max(0, peaks.Min(m => m.Mass)) - 4, peaks.Max(m => m.Mass) + 5);
             }
 
-            return new SpectrumChartData
-            {
+            return new SpectrumChartData{
                 MassRange = massRange,
                 SpectrumDistanceDetails = null,
                 Spectrum = spectrum,
@@ -158,8 +143,7 @@ namespace OpenMS.AdapterNodes
             };
         }
 
-        public override MassSpectrumItem GetInitalSelectedSpectrum(MSOrderType msOrder)
-        {
+        public override MassSpectrumItem GetInitalSelectedSpectrum(MSOrderType msOrder){
             return SelectSpectralTreeNode(m_unknownFeatureIonInstanceItems.First().RetentionTime, msOrder);
         }
     }

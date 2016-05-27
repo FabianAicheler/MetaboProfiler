@@ -28,7 +28,7 @@ using Thermo.Metabolism.DataObjects.Constants;
 namespace OpenMS.AdapterNodes
 {
 
-    public partial class OpenMSFeatureFinderNode : ProcessingNode<UnknownFeatureConsolidationProvider, ConsensusXMLFile>,
+    public partial class OpenMSMetaboProfilerNode : ProcessingNode<UnknownFeatureConsolidationProvider, ConsensusXMLFile>,
         IResultsSink<MassSpectrumCollection>
 	{        		
 

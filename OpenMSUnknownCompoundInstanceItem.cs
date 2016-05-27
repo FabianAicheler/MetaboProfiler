@@ -52,7 +52,7 @@ namespace OpenMS.AdapterNodes
         /// </summary>		
         [EntityProperty(
             DisplayName = "Molecular Weight",
-            Description = "Neutral mass in Da calculated from the left most isotope",
+            Description = "Neutral mass in Da calculated from the left most isotopes of grouped ions",
             FormatString = "0.00000",
             DataPurpose = CDEntityDataPurpose.MolecularWeight)]
         [GridDisplayOptions(
@@ -72,7 +72,8 @@ namespace OpenMS.AdapterNodes
             DataPurpose = CDEntityDataPurpose.MassOverCharge)]
         [GridDisplayOptions(
             VisiblePosition = 400,
-            TextHAlign = GridCellHAlign.Right)]
+            TextHAlign = GridCellHAlign.Right,
+            DataVisibility = GridVisibility.Hidden)]
         [PlottingOptions(
             PlotType = PlotType.Numeric)]
         public double Mass { get; set; }
@@ -119,7 +120,8 @@ namespace OpenMS.AdapterNodes
         [GridDisplayOptions(
             VisiblePosition = 800,
             ColumnWidth = 100,
-            TextHAlign = GridCellHAlign.Right)]
+            TextHAlign = GridCellHAlign.Right,
+            DataVisibility = GridVisibility.Hidden)]
         [PlottingOptions(
             PlotType = PlotType.Numeric)]
         public double Area { get; set; }
@@ -156,7 +158,8 @@ namespace OpenMS.AdapterNodes
         [GridDisplayOptions(
             VisiblePosition = 1100,
             GridCellControlGuid = "ECF3E1A3-0A57-458E-8C9C-83B5B1476242",
-            TextHAlign = GridCellHAlign.Center)]
+            TextHAlign = GridCellHAlign.Center,
+            DataVisibility = GridVisibility.Hidden)]
         [PlottingOptions(
             PlotType = PlotType.Numeric)]
         public int FileID { get; set; }
@@ -165,7 +168,8 @@ namespace OpenMS.AdapterNodes
         /// Gets or sets the feature ID.
         /// </summary>		
         [EntityProperty(
-            DisplayName = "FeatureID",
+            DisplayName = "Decharged Compound ID",
+            Description = "OpenMS ID of adduct-grouped compound",
             DataPurpose = CDEntityDataPurpose.ID)]
         [GridDisplayOptions(
             VisiblePosition = 1200,
@@ -192,7 +196,7 @@ namespace OpenMS.AdapterNodes
         /// </summary>
         public override string ToString()
         {
-            return string.Format("ID:{0} {1}, MZ:{2} RT:{3:F2}", ID, Mass, RetentionTime);
+            return string.Format("ID:{0} {1}, MolecularWeight:{2} RT:{3:F2}", ID, MolecularWeight, RetentionTime);
         }
 
         /// <summary>
@@ -201,8 +205,8 @@ namespace OpenMS.AdapterNodes
         public string GetTooltip()
         {
             return String.Format(
-                "MZ: {0:F5}\nRT: {1:F3} min\n",
-                Mass,
+                "MolecularWeight: {0:F5}\nRT: {1:F3} min\n",
+                MolecularWeight,
                 RetentionTime);
         }
 

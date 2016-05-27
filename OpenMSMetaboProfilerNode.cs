@@ -97,7 +97,7 @@ namespace OpenMS.AdapterNodes
 
 	#endregion
 
-    public partial class OpenMSFeatureFinderNode : ProcessingNode<UnknownFeatureConsolidationProvider, ConsensusXMLFile>,
+    public partial class OpenMSMetaboProfilerNode : ProcessingNode<UnknownFeatureConsolidationProvider, ConsensusXMLFile>,
         IResultsSink<MassSpectrumCollection>
 	{
 
@@ -118,7 +118,7 @@ namespace OpenMS.AdapterNodes
         [MassToleranceParameter(
             Category = "1. Feature Finding", /// Accurate Mass Search",
             DisplayName = "Mass Tolerance",
-            Description = "This parameter specifies the mass tolerance for XIC creation and metabolite feature finding.",
+            Description = "The allowed mass tolerance for XIC creation and metabolite feature finding.",
             Subset = "ppm", // required by current design
             DefaultValue = "5 ppm",
             MinimumValue = "0.2 ppm",
@@ -129,7 +129,7 @@ namespace OpenMS.AdapterNodes
 
         [DoubleParameter(Category = "1. Feature Finding",
             DisplayName = "Noise Threshold",
-            Description = "This parameter specifies the intensity threshold below which peaks are rejected as noise.",
+            Description = "The intensity threshold below which peaks are rejected as noise.",
             DefaultValue = "10000")] //10000 based on observed intensities in instrument data
         public DoubleParameter NoiseThreshold;
 
@@ -138,14 +138,9 @@ namespace OpenMS.AdapterNodes
         //    SelectionValues = new string[] { "positive", "negative" })]
         //public SimpleSelectionParameter<string> ion_mode;
 
-        //[StringSelectionParameter(Category = "1. Metabolite Feature Finding", /// Accurate Mass Search",
-        //    DisplayName = "Report mode of Accurate Mass Search",
-        //    SelectionValues = new string[] { "all", "top3", "best" })]
-        //public SimpleSelectionParameter<string> report_mode;
-
         [BooleanParameter(Category = "2. Feature Linking",
             DisplayName = "Do Map Alignment",
-            Description = "This parameter specifies whether a linear map alignment should be performed.",
+            Description = "Whether a linear map alignment of all samples should be performed.",
             DefaultValue = "true",
             Position = 1)]
         public BooleanParameter do_map_alignment;
@@ -156,7 +151,7 @@ namespace OpenMS.AdapterNodes
         [DoubleParameter(
             Category = "2. Feature Linking",
             DisplayName = "Max. RT Difference [min]",
-            Description = "This parameter specifies the maximum allowed retention time difference for feature pairs during model building of the alignment and during feature linking.",
+            Description = "The maximum allowed retention time difference for feature pairs during model building of the alignment and during feature linking.",
             DefaultValue = "0.33",
             Position = 2)]
         public DoubleParameter RTThreshold;
@@ -167,7 +162,7 @@ namespace OpenMS.AdapterNodes
         [DoubleParameter(
             Category = "2. Feature Linking",
             DisplayName = "Max. m/z Difference [ppm]",
-            Description = "This parameter specifies the maximum allowed m/z difference in ppm for feature pairs during model building of the alignment and during feature linking.",
+            Description = "The maximum allowed m/z difference in ppm for feature pairs during model building of the alignment and during feature linking.",
             DefaultValue = "10",
             Position = 3)]
         public DoubleParameter MZThreshold;
@@ -186,7 +181,7 @@ namespace OpenMS.AdapterNodes
         [IntegerParameter(
             Category = "3. Ionization",
             DisplayName = "Linked feature number to consider for adduct grouping",
-            Description = "Minimum required number of samples a feature has to occur in to be considered for adduct grouping.",
+            Description = "Minimum number of samples a feature has to occur in to be considered for adduct grouping.",
             DefaultValue = "2",
             MinimumValue = "1",
             Position = 2)]
@@ -204,7 +199,7 @@ namespace OpenMS.AdapterNodes
         [IntegerParameter(
             Category = "3. Ionization",
             DisplayName = "Max. charge",
-            Description = "Maximal allowed charge of adduct combinations.",
+            Description = "Maximum charge of adduct combinations.",
             DefaultValue = "2",
             MinimumValue = "1",
             Position = 2)]
@@ -214,7 +209,7 @@ namespace OpenMS.AdapterNodes
         [DoubleParameter(
             Category = "3. Ionization",
             DisplayName = "Max. allowed mass error (Th)",
-            Description = "The allowed mass error (in Th) between deduced compound and its decharged ions.",
+            Description = "Allowed mass error (in Th) of putative adduct ions to consider for adduct pairs.",
             DefaultValue = "0.001",
             MinimumValue = "0.00000001",
             Position = 2)]
@@ -223,7 +218,7 @@ namespace OpenMS.AdapterNodes
         [DoubleParameter(
             Category = "3. Ionization",
             DisplayName = "Max. allowed retention difference (s)",
-            Description = "Allowed retention distance (in seconds) to consider feature pairs.",
+            Description = "Allowed retention distance (in seconds) of ions to consider for adduct pairs.",
             DefaultValue = "1.0",
             MinimumValue = "0.0",
             Position = 2)]
@@ -231,7 +226,7 @@ namespace OpenMS.AdapterNodes
 
         [BooleanParameter(Category = "4. Output",
         DisplayName = "Save Tool Results",
-        Description = "This parameter specifies whether the OpenMS tool output should be saved in addition to the Compound Discoverer result files.",
+        Description = "Should OpenMS tools output be saved in addition to the Compound Discoverer result files?",
         DefaultValue = "true",
         Position = 1)]
         public BooleanParameter do_save;
@@ -286,26 +281,7 @@ namespace OpenMS.AdapterNodes
                 m_numSteps += m_numFiles ; //MapAlign
             }
 
-
-
-
             var exportedList = new List<string>(m_numFiles);
-
-            #region previouscode
-            //// Group spectra by file id and process 
-            //foreach (var spectrumDescriptorsGroupedByFileId in m_spectrumDescriptors
-            //    .Where(w => (w.ScanEvent.MSOrder == MSOrderType.MS1))//.Where(w=>w.ScanEvent.MSOrder == MSOrderType.MS1) //if we remove, we get 1 spec per file
-            //    .GroupBy(g => g.Header.FileID))
-            //{
-            //    // Group by the scan event of the MS1 spectrum to avoid mixing up different polarities or scan ranges
-            //    foreach (var grp in spectrumDescriptorsGroupedByFileId.GroupBy(g => g.ScanEvent))
-            //    {
-            //        int fileId = spectrumDescriptorsGroupedByFileId.Key;
-
-            //        // Flatten the spectrum tree to a collection of spectrum descriptors. 
-            //        var spectrumDescriptors = grp.ToList();
-
-            #endregion
 
             foreach (var spectrumDescriptorsGroupedByFileId in m_spectrumDescriptors.GroupBy(g => g.Header.FileID))
             {
@@ -541,7 +517,7 @@ namespace OpenMS.AdapterNodes
                             {"noise_threshold_int", NoiseThreshold.ToString()},
                             {"trace_termination_outliers", "2"}}; //personal preference after looking at some mzML data for Thermo instruments (vs 3; 5)
                 
-                ini_path = Path.Combine(NodeScratchDirectory, @"FeatureFinderMetaboDefault.ini");
+                ini_path = Path.Combine(NodeScratchDirectory, @"FeatureFinderMetaboDefault_" + i.ToString() +  ".ini");
                 create_default_ini(execPath, ini_path);
                 WriteItem(ini_path, ffm_parameters);
                 SendAndLogMessage("Starting FeatureFinderMetabo for file [{0}]", invars[i]);
@@ -613,7 +589,7 @@ namespace OpenMS.AdapterNodes
                 }
                 //save as consensus.consensusXML, filenames are stored inside, file should normally be accessed from inside CD
                 outvars[0] = Path.Combine(Path.GetDirectoryName(invars[0]),
-                    "featureXML_consensus.consensusXML");
+                    "featureXML_cons.consensusXML");
                 m_consensusXML = new ConsensusXMLFile(outvars[0]);
 
                 execPath = Path.Combine(openMSdir, @"bin/FeatureLinkerUnlabeledQT.exe");
@@ -639,7 +615,7 @@ namespace OpenMS.AdapterNodes
                     invars[0] = m_consensusXML.get_name();
                     outvars[0] = Path.Combine(Path.GetDirectoryName(invars[0]),
                         Path.GetFileNameWithoutExtension(invars[0])) +
-                        "_filtered.consensusXML";
+                        "_filt.consensusXML";
                     execPath = Path.Combine(openMSdir, @"bin/FileFilter.exe");
                     Dictionary<string, string> filter_parameters = new Dictionary<string, string> {
                             {"in", invars[0]},
@@ -657,7 +633,7 @@ namespace OpenMS.AdapterNodes
                     invars[0] = outvars[0];
                     outvars[0] = Path.Combine(Path.GetDirectoryName(invars[0]),
                         Path.GetFileNameWithoutExtension(invars[0])) +
-                        "_decharged_in.featureXML";
+                        "_dc_in.featureXML";
                     execPath = Path.Combine(openMSdir, @"bin/FileConverter.exe");
                     Dictionary<string, string> convert_parameters = new Dictionary<string, string> {
                             {"in", invars[0]},
@@ -680,11 +656,11 @@ namespace OpenMS.AdapterNodes
                         String infolder = Path.GetDirectoryName(invars[0]);
                         String infile = Path.GetFileNameWithoutExtension(invars[0]);
                         String out_cm = Path.Combine(infolder, infile) +
-                                                "_decharged_cm_" + tmp_max_charge.ToString() + ".consensusXML";
+                                                "_dc_cm_" + tmp_max_charge.ToString() + ".consensusXML";
                         String out_fm = Path.Combine(infolder, infile) +
-                                                "_decharged_fm_" + tmp_max_charge.ToString() + ".featureXML";
+                                                "_dc_fm_" + tmp_max_charge.ToString() + ".featureXML";
                         String out_pairs = Path.Combine(infolder, infile) +
-                                                "_decharged_outpairs_" + tmp_max_charge.ToString() + ".consensusXML";
+                                                "_dc_outpairs_" + tmp_max_charge.ToString() + ".consensusXML";
                         execPath = Path.Combine(openMSdir, @"bin/Decharger.exe");
                         Dictionary<string, string> decharge_parameters = new Dictionary<string, string> {
                             {"in", invars[0]},
@@ -698,13 +674,13 @@ namespace OpenMS.AdapterNodes
                             {"retention_max_diff_local", Decharger_rt_max_diff.ToString()},
                             {"mass_max_diff", Decharger_mass_max_diff.ToString()},
                             {"out_type", "consensusXML"}};
-                        ini_path = Path.Combine(NodeScratchDirectory, @"DechargerDefault.ini");
+                        ini_path = Path.Combine(NodeScratchDirectory, @"DechargerDefault_maxcharge_" + tmp_max_charge.ToString() + ".ini");
                         create_default_ini(execPath, ini_path);
                         WriteItem(ini_path, decharge_parameters);
                         char[] delimiter = { ';' };
                         string[] adducts = MultilineStringParameter.MultilineToSingleLine(Decharger_potential_adducts.Value, ';').Split(delimiter);
                         replaceItemList(adducts, ini_path, "potential_adducts");
-                        RunTool(execPath, ini_path);
+                        RunTool(execPath, ini_path, true);
                         outvars[0] = out_fm;
                         m_decharge_cm = new ConsensusXMLFile(out_cm);
                         m_decharge_fm = new featureXMLFile(out_fm); //only interested in last decharged
@@ -960,7 +936,7 @@ namespace OpenMS.AdapterNodes
 
             //experimental compound
             EntityDataService.InsertItems(compoundToFeatureIon.Keys);
-            EntityDataService.InsertItems(compoundToFeatureIon.Values.SelectMany(s => s));
+            //EntityDataService.InsertItems(compoundToFeatureIon.Values.SelectMany(s => s)); //think not necessary, already featureiontopeaks.keys
             EntityDataService.ConnectItems(compoundToFeatureIon.Select(s => Tuple.Create(s.Key, s.Value.AsEnumerable())));
             //EntityDataService.ConnectItems(compoundToFeatureIon.Select(s => Tuple.Create(s.Key, s.Value.AsEnumerable())));
 
@@ -1002,6 +978,7 @@ namespace OpenMS.AdapterNodes
                 var ions = new List<UnknownFeatureIonInstanceItem>();
                 foreach (XmlNode element in consensusElement.GetElementsByTagName("element")){
                     var fid = Convert.ToUInt64(element.Attributes["id"].Value);//already only number here
+                    elements.Add(fid);
                     //elements.Add(fid);//fid=id of consensusXml consensus element
                     List <ulong> featureIonsIds =  m_cons_to_feat_dict[fid];
                     foreach (var id in featureIonsIds) {
@@ -1011,19 +988,13 @@ namespace OpenMS.AdapterNodes
                     }
                 }
 
-                //var unknownCompoundInstanceItem = new UnknownCompoundInstanceItem()
-                //{
-                //    ID = EntityDataService.NextId<UnknownCompoundInstanceItem>(),
-                //    MolecularWeight = mz,
-                //    RetentionTime = rt,
-                //    NumberOfAdducts = elements.Count
-                //};                
                 var openMSUnknownCompoundInstanceItem = new OpenMSUnknownCompoundInstanceItem()
                 {
                     ID = EntityDataService.NextId<OpenMSUnknownCompoundInstanceItem>(),
                     MolecularWeight = mz,
                     RetentionTime = rt,
-                    NumberOfAdducts = elements.Count
+                    NumberOfAdducts = elements.Count,
+                    FeatureID = cent_id.ToString()
                 };
                 //m_dc_to_cons_dict.Add(cent_id, elements);
                 //dict.Add(unknownCompoundInstanceItem, ions);

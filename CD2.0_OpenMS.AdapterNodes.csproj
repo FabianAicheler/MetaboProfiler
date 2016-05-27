@@ -266,7 +266,7 @@
   <ItemGroup>
     <Compile Include="OpenMSFeatureFinderNodeMassSpectra.cs" />
     <Compile Include="OpenMSFeatureFinderNodeTools.cs" />
-    <Compile Include="OpenMSFeatureFinderNode.cs" />
+    <Compile Include="OpenMSMetaboProfilerNode.cs" />
     <Compile Include="UnknownFeatureIonInstanceItem.cs" />
     <Compile Include="UnknownFeatureInstanceItemChromatogramChartDataProvider.cs" />
     <Compile Include="TracePointSumClass.cs" />
