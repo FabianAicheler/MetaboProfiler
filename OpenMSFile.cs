@@ -6,22 +6,22 @@ using System.Threading.Tasks;
 
 namespace OpenMS.OpenMSFile
 {
-    public class OpenMSFile
-    {
-        private String file;
+    //public class OpenMSFile 
+    //{
+    //    private String file;
 
-        public OpenMSFile() {}
+    //    public OpenMSFile() {}
 
-        public OpenMSFile(string file)
-        {
-            this.file = file;
-        }
+    //    public OpenMSFile(string file)
+    //    {
+    //        this.file = file;
+    //    }
 
-        public String get_name()
-        {
-            return this.file;
-        }
-    }
+    //    public String get_name()
+    //    {
+    //        return this.file;
+    //    }
+    //}
 
     //custom OpenMS file classes for Results
     public class mzTabFile
