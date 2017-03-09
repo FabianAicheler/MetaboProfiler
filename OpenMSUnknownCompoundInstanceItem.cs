@@ -114,14 +114,14 @@ namespace OpenMS.AdapterNodes
         /// </summary>		
         [EntityProperty(
             DisplayName = "Area",
-            Description = "Summed area of all related peaks per input file",
+            Description = "Summed area of related ions after linking",
             FormatString = "0",
             DataPurpose = CDEntityDataPurpose.AreaSum)]
         [GridDisplayOptions(
             VisiblePosition = 800,
             ColumnWidth = 100,
             TextHAlign = GridCellHAlign.Right,
-            DataVisibility = GridVisibility.Hidden)]
+            DataVisibility = GridVisibility.Visible)]
         [PlottingOptions(
             PlotType = PlotType.Numeric)]
         public double Area { get; set; }

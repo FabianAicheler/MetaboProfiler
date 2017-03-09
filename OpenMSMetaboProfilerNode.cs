@@ -975,6 +975,7 @@ namespace OpenMS.AdapterNodes
                 var centroid = consensusElement.SelectSingleNode(@"./centroid");
                 var rt = Double.Parse(centroid.Attributes["rt"].Value)/60.0;
                 var mz = Double.Parse(centroid.Attributes["mz"].Value);
+                var area = Double.Parse(centroid.Attributes["it"].Value);
                 var ions = new List<UnknownFeatureIonInstanceItem>();
                 foreach (XmlNode element in consensusElement.GetElementsByTagName("element")){
                     var fid = Convert.ToUInt64(element.Attributes["id"].Value);//already only number here
@@ -991,6 +992,7 @@ namespace OpenMS.AdapterNodes
                 var openMSUnknownCompoundInstanceItem = new OpenMSUnknownCompoundInstanceItem()
                 {
                     ID = EntityDataService.NextId<OpenMSUnknownCompoundInstanceItem>(),
+                    Area = area,
                     MolecularWeight = mz,
                     RetentionTime = rt,
                     NumberOfAdducts = elements.Count,
